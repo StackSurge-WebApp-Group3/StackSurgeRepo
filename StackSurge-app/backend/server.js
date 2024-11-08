@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const contactRoutes = require('./routes/contactRoutes');
+const contactRoutes = require('./routes/userRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 const app = express();
@@ -24,3 +24,4 @@ app.use('/api/users', userRoutes);
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
