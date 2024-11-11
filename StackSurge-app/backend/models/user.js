@@ -1,11 +1,19 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
-  password: { type: String, required: true },
-  created: { type: Date, default: Date.now },
-  updated: { type: Date, default: Date.now }
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  hashed_pwd: { type: String, required: true },
+  interests: [{ type: String }],
+  enrolledEvents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }], 
+  volunteerTime: { type: Number, default: 0 },
+  givenReviews: [{
+    comment: String,
+    rating: { type: Number, min: 1, max: 5 }
+  }]
+}, {
+  timestamps: true
 });
 
 module.exports = mongoose.model('User', userSchema);

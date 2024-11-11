@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const contactRoutes = require('./routes/userRoutes');
+const eventRoutes = require('./routes/eventRoutes');
 const userRoutes = require('./routes/userRoutes');
 
 const app = express();
@@ -16,12 +16,8 @@ mongoose.connect('mongodb+srv://aysha:ta4FhSFfKN0f39qR@cluster0.2maws.mongodb.ne
 .then(() => console.log('MongoDB connected'))
 .catch(err => console.error('MongoDB connection error:', err));
 
-
-app.use('/api/contacts', contactRoutes);
+app.use('/api/events', eventRoutes);
 app.use('/api/users', userRoutes);
-
-
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
-
