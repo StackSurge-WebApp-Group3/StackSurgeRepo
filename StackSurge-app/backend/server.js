@@ -1,23 +1,28 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
-const eventRoutes = require('./routes/eventRoutes');
-const userRoutes = require('./routes/userRoutes');
+import express from "express";
+import mongoose from "mongoose";
+import bodyParser from "body-parser";
+
+import userRoutes from "./routes/userRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 
-mongoose.connect('mongodb+srv://aysha:ta4FhSFfKN0f39qR@cluster0.2maws.mongodb.net/StackSurge?retryWrites=true&w=majority&appName=Cluster0', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
+mongoose
+  .connect(
+    "mongodb+srv://aysha:ta4FhSFfKN0f39qR@cluster0.2maws.mongodb.net/StackSurge?retryWrites=true&w=majority&appName=Cluster0",
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
-app.use('/api/events', eventRoutes);
-app.use('/api/users', userRoutes);
+app.use("/api/events", eventRoutes);
+app.use("/api/users", userRoutes);
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
