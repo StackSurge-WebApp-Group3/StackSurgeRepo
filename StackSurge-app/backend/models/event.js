@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from "mongoose";
 
 const eventSchema = new mongoose.Schema({
   title: { type: String, required: true },
@@ -11,13 +11,15 @@ const eventSchema = new mongoose.Schema({
   duration: { type: Number, required: true },
   sponsors: [String],
   totalAvailableSlots: { type: Number, required: true },
-  status: { type: String, enum: ['open', 'closed'], default: 'open' },
-  volunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  reviews: [{
-    comment: String,
-    rating: { type: Number, min: 1, max: 5 }
-  }],
-  avg_rating: { type: Number, default: 0 }
+  status: { type: String, enum: ["open", "closed"], default: "open" },
+  volunteers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  reviews: [
+    {
+      comment: String,
+      rating: { type: Number, min: 1, max: 5 },
+    },
+  ],
+  avg_rating: { type: Number, default: 0 },
 });
 
-module.exports = mongoose.model('Event', eventSchema);
+export default mongoose.model("Event", eventSchema);
