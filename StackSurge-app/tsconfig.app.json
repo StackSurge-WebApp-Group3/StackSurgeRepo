@@ -20,7 +20,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* Add these lines */
+    "types": ["@types/babel__generator", "@types/babel__template", "@types/babel__traverse", "@types/json-schema"]
   },
   "include": ["src"]
 }
