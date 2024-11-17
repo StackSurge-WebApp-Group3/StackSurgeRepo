@@ -1,5 +1,5 @@
 import express from "express";
-
+import authCtrl from "../controllers/authController.js";
 import {
   createEvent,
   getEvents,
@@ -16,14 +16,21 @@ const router = express.Router();
 
 router.post("/", createEvent);
 router.get("/", getEvents);
-router.get("/:id", getEventById);
-router.put("/:id", updateEvent);
-router.delete("/:id", removeEvent);
 
-router.post("/:id/register", registerForEvent);
-router.delete("/:id/cancel-registration", cancelRegistration);
+router
+  .route("/:id")
+  .get(authCtrl.requireSignin, getEventById)
+  .put(authCtrl.requireSignin, updateEvent)
+  .delete(authCtrl.requireSignin, removeEvent);
 
-router.post("/:id/review", addReview);
-router.get("/:id/reviews", getEventReviews);
+router.post("/:id/register", authCtrl.requireSignin, registerForEvent);
+router.post(
+  "/:id/cancel-registration",
+  authCtrl.requireSignin,
+  cancelRegistration
+);
+
+router.get("/:id/reviews", authCtrl.requireSignin, getEventReviews);
+router.post("/:id/reviews", authCtrl.requireSignin, addReview);
 
 export default router;
