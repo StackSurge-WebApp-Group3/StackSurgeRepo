@@ -1,5 +1,5 @@
 import express from "express";
-import authCtrl from "../controllers/authController.js"
+import authCtrl from "../controllers/authController.js";
 import {
   createEvent,
   getEvents,
@@ -14,18 +14,23 @@ import {
 
 const router = express.Router();
 
+router.post("/", createEvent);
+router.get("/", getEvents);
 
-router.post("/", createEvent, authCtrl.requireSignin,authCtrl.hasAuthorization);
-router.get("/", getEvents, authCtrl.requireSignin,authCtrl.hasAuthorization);
-router.get("/:id", getEventById,authCtrl.requireSignin,authCtrl.hasAuthorization);
-router.put("/:id", updateEvent,authCtrl.requireSignin,authCtrl.hasAuthorization);
-router.delete("/:id", removeEvent,authCtrl.requireSignin,authCtrl.hasAuthorization);
+router
+  .route("/:id")
+  .get(authCtrl.requireSignin, getEventById)
+  .put(authCtrl.requireSignin, updateEvent)
+  .delete(authCtrl.requireSignin, removeEvent);
 
-router.post("/:id/register", registerForEvent,authCtrl.requireSignin,authCtrl.hasAuthorization);
-router.delete("/:id/cancel-registration", cancelRegistration,authCtrl.requireSignin,authCtrl.hasAuthorization);
+router.post("/:id/register", authCtrl.requireSignin, registerForEvent);
+router.post(
+  "/:id/cancel-registration",
+  authCtrl.requireSignin,
+  cancelRegistration
+);
 
-router.post("/:id/review", addReview,authCtrl.requireSignin,authCtrl.hasAuthorization);
-router.get("/:id/reviews", getEventReviews,authCtrl.requireSignin,authCtrl.hasAuthorization);
+router.get("/:id/reviews", authCtrl.requireSignin, getEventReviews);
+router.post("/:id/reviews", authCtrl.requireSignin, addReview);
 
 export default router;
-  

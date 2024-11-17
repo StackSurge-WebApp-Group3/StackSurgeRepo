@@ -98,17 +98,17 @@ export async function registerForEvent(req, res) {
     if (event.totalAvailableSlots <= event.volunteers.length) {
       return res.status(400).json({ message: "No slots available" });
     }
-    if (event.volunteers.includes(req.user.id)) {
+    if (event.volunteers.includes(req.auth._id)) {
       return res.status(400).json({ message: "User is already registered" });
     }
 
-    // Assuming the user is authenticated and the user ID is stored in req.user.id
-    event.volunteers.push(req.user.id);
+    // Assuming the user is authenticated
+    event.volunteers.push(req.auth._id);
 
     // Update event and add it to the user’s enrolledEvents
     await Promise.all([
       event.save(),
-      User.findByIdAndUpdate(req.user.id, {
+      User.findByIdAndUpdate(req.auth._id, {
         $push: { enrolledEvents: event._id },
       }),
     ]);
@@ -128,15 +128,15 @@ export async function cancelRegistration(req, res) {
       return res.status(404).json({ message: "Event not found" });
     }
 
-    // Assuming the user is authenticated and the user ID is stored in req.user.id
+    // Assuming the user is authenticated
     event.volunteers = event.volunteers.filter(
-      (volunteerId) => volunteerId.toString() !== req.user.id
+      (volunteerId) => volunteerId.toString() !== req.auth._id
     );
 
     // Save event and remove event reference from user’s enrolledEvents
     await Promise.all([
       event.save(),
-      User.findByIdAndUpdate(req.user.id, {
+      User.findByIdAndUpdate(req.auth._id, {
         $pull: { enrolledEvents: event._id },
       }),
     ]);
@@ -158,25 +158,38 @@ export async function addReview(req, res) {
       return res.status(404).json({ message: "Event not found" });
     }
 
+    // Check if the user has already reviewed this event
+    const existingReview = await Review.findOne({
+      event: event._id,
+      user: req.auth._id,
+    });
+
+    if (existingReview) {
+      return res.status(400).json({
+        message: "You have already reviewed this event.",
+      });
+    }
+
     // Create the review
     const review = new Review({
       comment,
       rating,
-      user: req.user.id, // Assuming `req.user.id` contains the authenticated user's ID
+      user: req.auth._id,
       event: event._id,
     });
 
-    // Add review reference to Event and recalculate avg_rating
+    // Add review reference to Event and update the average rating
+    const newAvgRating =
+      (event.avg_rating * event.reviews.length + rating) /
+      (event.reviews.length + 1);
     event.reviews.push(review._id);
-    event.avg_rating =
-      event.reviews.reduce((sum, review) => sum + review.rating, 0) /
-      event.reviews.length;
+    event.avg_rating = newAvgRating;
 
     // Save review, event, and update user’s givenReviews
     await Promise.all([
       review.save(),
       event.save(),
-      User.findByIdAndUpdate(req.user.id, {
+      User.findByIdAndUpdate(req.auth._id, {
         $push: { givenReviews: review._id },
       }),
     ]);
