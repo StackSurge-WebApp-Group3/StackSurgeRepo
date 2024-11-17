@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema({
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  hashed_pwd: { type: String, required: true },
+  password: { type: String, required: true },
   interests: [{ type: String }],
   enrolledEvents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Event' }],
   volunteerTime: { type: Number, default: 0 },
