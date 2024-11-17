@@ -68,3 +68,9 @@ export const removeAllUsers = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const read = (req, res) => {
+  req.profile.hashed_password = undefined 
+  req.profile.salt = undefined
+  return res.json(req.profile) 
+  }
