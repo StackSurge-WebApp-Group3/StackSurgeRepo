@@ -8,6 +8,7 @@ import {
   removeUser,
   removeAllUsers,
   userByID,
+  getUserProfile,
 } from "../controllers/userController.js";
 import authCtrl from "../controllers/authController.js";
 const router = express.Router();
@@ -15,6 +16,8 @@ const router = express.Router();
 router.get("/", getAllUsers);
 router.post("/", addUser);
 router.delete("/", removeAllUsers);
+
+router.route("/profile").get(authCtrl.requireSignin, getUserProfile);
 
 router.param("id", userByID);
 router

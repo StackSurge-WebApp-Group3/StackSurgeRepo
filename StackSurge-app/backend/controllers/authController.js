@@ -18,8 +18,11 @@ const signin = async (req, res) => {
       token,
       user: {
         _id: user._id,
-        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
         email: user.email,
+        interests: user.interests,
+        volunteerTime: user.volunteerTime,
       },
     });
   } catch (err) {
