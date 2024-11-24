@@ -27,5 +27,5 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function signOut() {
-  await axiosClient.get("/auth/signout");
+  await axiosClient.post("/auth/signout");
 }
