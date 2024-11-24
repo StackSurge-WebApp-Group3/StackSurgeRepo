@@ -46,6 +46,21 @@ export const getUserById = async (req, res) => {
   }
 };
 
+// Get the current logged in user
+export const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.auth._id).select(
+      "firstName lastName email interests enrolledEvents volunteerTime givenReviews"
+    );
+
+    if (!user) return res.status(404).json({ message: "Profile not found" });
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Add a new user
 export const addUser = async (req, res) => {
   try {
