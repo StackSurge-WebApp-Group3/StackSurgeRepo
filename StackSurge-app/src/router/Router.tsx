@@ -1,22 +1,25 @@
-import { Route, Routes } from 'react-router-dom'
+import { Route, Routes } from "react-router-dom";
 
-import { ROUTES } from './routes'
+import { AUTH_ROUTES, PRIVATE_ROUTES, PUBLIC_ROUTES } from "./routes";
+import { PrivateRoute } from "./PrivateRoute";
 
-function Router() {
+export function Router() {
   return (
     <Routes>
-      {ROUTES.map((route) => {
-        const { Component, path } = route
-
-        return (
-          <Route
-            element={<Component />}
-            path={path}
-          />
-        )
-      })}
+      {[...PUBLIC_ROUTES, ...AUTH_ROUTES].map(({ Component, path }) => (
+        <Route key={path} path={path} element={<Component />} />
+      ))}
+      {PRIVATE_ROUTES.map(({ Component, path }) => (
+        <Route
+          key={path}
+          path={path}
+          element={
+            <PrivateRoute>
+              <Component />
+            </PrivateRoute>
+          }
+        />
+      ))}
     </Routes>
-  )
+  );
 }
-
-export default Router

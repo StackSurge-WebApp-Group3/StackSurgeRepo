@@ -16,23 +16,13 @@ export enum AppPath {
   Profile = "/profile",
 }
 
-type AppRoute = {
+export type AppRoute = {
   title: string;
   path: AppPath;
   Component: () => JSX.Element;
 };
 
-export const ROUTES: AppRoute[] = [
-  {
-    title: "Home",
-    path: AppPath.Home,
-    Component: Home,
-  },
-  {
-    title: "About Us",
-    path: AppPath.AboutUs,
-    Component: AboutUs,
-  },
+export const AUTH_ROUTES: AppRoute[] = [
   {
     title: "Sign Up",
     path: AppPath.SignUp,
@@ -43,6 +33,22 @@ export const ROUTES: AppRoute[] = [
     path: AppPath.Login,
     Component: Login,
   },
+];
+
+export const PUBLIC_ROUTES: AppRoute[] = [
+  {
+    title: "Home",
+    path: AppPath.Home,
+    Component: Home,
+  },
+  {
+    title: "About Us",
+    path: AppPath.AboutUs,
+    Component: AboutUs,
+  },
+];
+
+export const PRIVATE_ROUTES: AppRoute[] = [
   {
     title: "Events",
     path: AppPath.Events,
