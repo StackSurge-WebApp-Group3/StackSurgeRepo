@@ -84,6 +84,10 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 20,
+          boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.5)', // Adding a small drop shadow
+          '&:hover': {
+            boxShadow: '0px 6px 12px rgba(0, 0, 0, 0.8)', // Slightly stronger shadow on hover
+          },
         },
       },
     },
