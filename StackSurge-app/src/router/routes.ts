@@ -49,8 +49,7 @@ export const PUBLIC_ROUTES: AppRoute[] = [
 ];
 
 export const PRIVATE_ROUTES: AppRoute[] = [
-  {
-    title: "Events",
+  { title: "Events",
     path: AppPath.Events,
     Component: Events,
   },
