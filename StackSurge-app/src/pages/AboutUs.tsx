@@ -11,33 +11,33 @@ import { ScreenContainer } from "../components/ScreenContainer";
 const teamMembers = [
   {
     name: "Ameekha",
-    role: "Agile Project Manager & Documentation",
-    image: "/images/ameekha.jpg",
+    role: "Project Management & Tracking",
+    image: "../src/assets/ameekha.png",
   },
   {
-    name: "Aysha",
-    role: "Express Server & MongoDB Setup",
-    image: "/images/aysha.jpg",
+    name: "Aisha",
+    role: "Backend Developer",
+    image: "../src/assets/aisha.png",
   },
   {
     name: "Estefany",
-    role: "Backend: Event CRUD, RSVP, Feedback/Ratings",
-    image: "/images/estefany.jpg",
+    role: "Backend Developer",
+    image: "../src/assets/estefany.png",
   },
   {
     name: "Ido Isaac",
-    role: "Wireframes & External Design",
-    image: "/images/ido.jpg",
+    role: "UI Designer",
+    image: "../src/assets/ido.png",
   },
   {
     name: "Patrick",
-    role: "Backend: User API & Authentication",
-    image: "/images/patrick.jpg",
+    role: "Backend Developer",
+    image: "../src/assets/patrick.png",
   },
   {
     name: "Zachary Lyons",
-    role: "Presentation Slides & Video",
-    image: "/images/zachary.jpg",
+    role: "Frontend Developer",
+    image: "../src/assets/zach.png",
   },
 ];
 
