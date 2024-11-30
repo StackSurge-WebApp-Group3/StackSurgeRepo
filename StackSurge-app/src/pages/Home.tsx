@@ -48,7 +48,6 @@ export function Home() {
           }}
         >
           <Typography variant="h2" component="h2" sx={{ textAlign: 'center', color: '#FFFFFF', marginTop: '70px' }}>
-            Hello! And Welcome To
           </Typography>
 
           <img
