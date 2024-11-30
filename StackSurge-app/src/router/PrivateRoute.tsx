@@ -1,14 +1,14 @@
 import { Navigate } from "react-router-dom";
-import { CircularProgress } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import { useAuth } from "../context/AuthContext";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { AppPath } from "./routes";
 
 export function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useAuth();
+  const { user, hasToken, isLoading } = useAuth();
 
-  if (isLoading) {
+  if (isLoading || (hasToken && !user)) {
     return (
       <ScreenContainer>
         <CircularProgress />
@@ -16,5 +16,5 @@ export function PrivateRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  return user ? children : <Navigate to={AppPath.Login} />;
+  return user ? children : <Navigate to={AppPath.Home} />;
 }

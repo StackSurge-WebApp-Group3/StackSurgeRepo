@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useQuery } from "react-query";
 
 import type { User } from "../types/User";
@@ -8,6 +8,7 @@ interface AuthContextType {
   user: User | null;
   setUser: (user: User | null) => void;
   isLoading: boolean;
+  hasToken: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,11 +18,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const token = localStorage.getItem("token");
+  const hasToken = Boolean(token);
 
   const { isLoading, isError, data } = useQuery({
     queryKey: ["user"],
     queryFn: fetchUserProfile,
-    enabled: Boolean(token),
+    enabled: hasToken,
     retry: false,
   });
 
@@ -38,8 +40,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [token, isLoading, isError, data]);
 
+  const value = useMemo(() => ({ user, setUser, isLoading, hasToken }), [
+    user,
+    setUser,
+    isLoading,
+    hasToken,
+  ]);
+
   return (
-    <AuthContext.Provider value={{ user, setUser, isLoading }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

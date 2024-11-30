@@ -1,3 +1,4 @@
+import { MouseEvent, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useMutation } from "react-query";
 
@@ -8,13 +9,19 @@ import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
-import LogoutIcon from "@mui/icons-material/Logout";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import Person from "@mui/icons-material/Person";
+import Logout from "@mui/icons-material/Logout";
+import AccountCircle from "@mui/icons-material/AccountCircle";
 
 import type { AppRoute } from "../router/routes";
 import {
-  PRIVATE_ROUTES,
   PUBLIC_ROUTES,
   AUTH_ROUTES,
+  EVENTS_ROUTE,
   AppPath,
 } from "../router/routes";
 import { useAuth } from "../context/AuthContext";
@@ -45,7 +52,7 @@ export function AppBar() {
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
 
-  const { mutate: logout, isLoading } = useMutation({
+  const { mutate: logout, isLoading: isLogoutLoading } = useMutation({
     mutationFn: () => signOut(),
     onSuccess: () => {
       setUser(null);
@@ -54,8 +61,28 @@ export function AppBar() {
     },
   });
 
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+
+  const handleOpenUserMenu = (event: MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const handleProfileClick = () => {
+    navigate(AppPath.Profile);
+    handleCloseUserMenu();
+  };
+
+  const handleLogoutClick = () => {
+    logout();
+    handleCloseUserMenu();
+  };
+
   const availableRoutes = user
-    ? [...PUBLIC_ROUTES, ...PRIVATE_ROUTES]
+    ? [EVENTS_ROUTE, ...PUBLIC_ROUTES.filter((route) => route.path !== AppPath.Home)]
     : [...PUBLIC_ROUTES, ...AUTH_ROUTES];
 
   return (
@@ -68,11 +95,49 @@ export function AppBar() {
             ))}
           </Box>
           {user && (
-            <Tooltip title="Logout" placement="left">
-              <IconButton onClick={() => logout()} disabled={isLoading}>
-                <LogoutIcon />
-              </IconButton>
-            </Tooltip>
+            <Box sx={{ flexGrow: 0 }}>
+              <Tooltip title="Open user menu">
+                <IconButton
+                  onClick={handleOpenUserMenu}
+                  size="large"
+                  aria-label="account of current user"
+                  aria-controls="menu-appbar"
+                  aria-haspopup="true"
+                  color="inherit"
+                >
+                  <AccountCircle />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                <MenuItem onClick={handleProfileClick}>
+                  <ListItemIcon>
+                    <Person fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Profile</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={handleLogoutClick} disabled={isLogoutLoading}>
+                  <ListItemIcon>
+                    <Logout fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Logout</ListItemText>
+                </MenuItem>
+              </Menu>
+            </Box>
           )}
         </Toolbar>
       </Container>
