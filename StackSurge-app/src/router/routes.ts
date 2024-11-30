@@ -46,9 +46,6 @@ export const PUBLIC_ROUTES: AppRoute[] = [
     path: AppPath.AboutUs,
     Component: AboutUs,
   },
-];
-
-export const PRIVATE_ROUTES: AppRoute[] = [
   { title: "Events",
     path: AppPath.Events,
     Component: Events,
@@ -58,8 +55,11 @@ export const PRIVATE_ROUTES: AppRoute[] = [
     path: AppPath.EventDetails,
     Component: EventDetails,
   },
-  {
-    title: "Profile",
+];
+
+export const PRIVATE_ROUTES: AppRoute[] = [
+ 
+  { title: "Profile",
     path: AppPath.Profile,
     Component: Profile,
   },
