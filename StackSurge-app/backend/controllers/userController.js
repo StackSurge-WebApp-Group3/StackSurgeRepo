@@ -49,9 +49,15 @@ export const getUserById = async (req, res) => {
 // Get the current logged in user
 export const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.auth._id).select(
-      "firstName lastName email interests enrolledEvents volunteerTime givenReviews"
-    );
+    const user = await User.findById(req.auth._id)
+      .select(
+        "firstName lastName email interests enrolledEvents volunteerTime givenReviews"
+      )
+      .populate({
+        path: "enrolledEvents",
+        select:
+          "title description coverImage category address city state datetime duration sponsors totalAvailableSlots status avg_rating reviews",
+      });
 
     if (!user) return res.status(404).json({ message: "Profile not found" });
 
