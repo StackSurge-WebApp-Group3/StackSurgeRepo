@@ -11,7 +11,7 @@ type ScreenContainerProps = {
 export function ScreenContainer({ children, sx }: ScreenContainerProps) {
   return (
     <Container
-      maxWidth='lg'
+      maxWidth='xl'
       sx={{
         minHeight: 'calc(100vh - 69px)',
         paddingBlock: 6,
