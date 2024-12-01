@@ -13,7 +13,16 @@ export async function getEvents(req, res) {
   };
 
   try {
-    const events = await Event.find(query);
+    const events = await Event.find(query)
+      .populate({
+        path: "reviews",
+        select: "comment rating",
+      })
+      .populate({
+        path: "volunteers",
+        select: "firstName lastName email",
+      });
+
     res.json(events);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -23,7 +32,15 @@ export async function getEvents(req, res) {
 // Get a specific event by ID
 export async function getEventById(req, res) {
   try {
-    const event = await Event.findById(req.params.id);
+    const event = await Event.findById(req.params.id)
+      .populate({
+        path: "reviews",
+        select: "comment rating",
+      })
+      .populate({
+        path: "volunteers",
+        select: "firstName lastName email",
+      });
 
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
@@ -87,7 +104,15 @@ export async function removeEvent(req, res) {
 // Add the logged-in user to the list of volunteers for an event if available
 export async function registerForEvent(req, res) {
   try {
-    const event = await Event.findById(req.params.id);
+    const event = await Event.findById(req.params.id)
+      .populate({
+        path: "reviews",
+        select: "comment rating",
+      })
+      .populate({
+        path: "volunteers",
+        select: "firstName lastName email",
+      });
 
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
@@ -122,7 +147,15 @@ export async function registerForEvent(req, res) {
 // Removes the logged-in user from the list of volunteers
 export async function cancelRegistration(req, res) {
   try {
-    const event = await Event.findById(req.params.id);
+    const event = await Event.findById(req.params.id)
+      .populate({
+        path: "reviews",
+        select: "comment rating",
+      })
+      .populate({
+        path: "volunteers",
+        select: "firstName lastName email",
+      });
 
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
@@ -152,7 +185,15 @@ export async function addReview(req, res) {
   const { rating, comment } = req.body;
 
   try {
-    const event = await Event.findById(req.params.id);
+    const event = await Event.findById(req.params.id)
+      .populate({
+        path: "reviews",
+        select: "comment rating",
+      })
+      .populate({
+        path: "volunteers",
+        select: "firstName lastName email",
+      });
 
     if (!event) {
       return res.status(404).json({ message: "Event not found" });

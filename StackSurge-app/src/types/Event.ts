@@ -1,3 +1,6 @@
+import type { EventReview } from "./Review";
+import type { User } from "./User";
+
 export const EVENT_CATEGORIES = [
   "Environment",
   "Education",
@@ -10,7 +13,12 @@ export const EVENT_CATEGORIES = [
 
 export type EventCategory = (typeof EVENT_CATEGORIES)[number];
 
-export type Event = {
+export type EventVolunteer = Pick<
+  User,
+  "_id" | "firstName" | "lastName" | "email"
+>;
+
+export type EventDetails = {
   _id: string;
   title: string;
   description?: string;
@@ -24,7 +32,7 @@ export type Event = {
   sponsors?: string[];
   totalAvailableSlots: number;
   status: "open" | "closed";
-  volunteers: string[];
-  reviews: string[];
+  volunteers: EventVolunteer[];
+  reviews: EventReview[];
   avg_rating: number;
 };

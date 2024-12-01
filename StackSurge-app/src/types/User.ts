@@ -1,4 +1,5 @@
-import { EventCategory } from "./Event";
+import type { EventCategory, EventDetails } from "./Event";
+import type { EventReview } from "./Review";
 
 export type User = {
   _id: string;
@@ -7,6 +8,6 @@ export type User = {
   email: string;
   interests: EventCategory[];
   volunteerTime: number;
-  enrolledEvents: string[];
-  givenReviews: string[];
+  enrolledEvents: EventDetails[];
+  givenReviews: EventReview[];
 };
