@@ -1,24 +1,5 @@
-/*
-import Stack from "@mui/material/Stack";
-import Typography from "@mui/material/Typography";
-
-import { ScreenContainer } from "../components/ScreenContainer";
-
-export function EventDetails() {
-  return (
-    <ScreenContainer>
-      <Stack gap={3} alignItems="center" style={{ width: "100%" }}>
-        <Typography variant="h4" component="h1" sx={{ textAlign: "center" }}>
-          Event Details
-        </Typography>
-      </Stack>
-    </ScreenContainer>
-  );
-}
-*/
-
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
@@ -51,63 +32,49 @@ interface Review {
 
 export function EventDetails() {
   const { eventId } = useParams<{ eventId: string }>();
+  const navigate = useNavigate();
   const [eventDetails, setEventDetails] = useState<EventDetailsProps | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [newReview, setNewReview] = useState("");
-  const [isRegistered, setIsRegistered] = useState(false); // State for tracking registration status
+  const [isRegistered, setIsRegistered] = useState(false);
 
   useEffect(() => {
+    // If eventId is missing, stop execution
+    if (!eventId) {
+      return;
+    }
+
     fetch(`http://localhost:3000/api/events/${eventId}`)
       .then((response) => response.json())
       .then((data) => {
+        console.log("API Response:", data);
         const dateTime = new Date(data.datetime);
         setEventDetails({
           title: data.title,
           images: [data.coverImage],
           time: dateTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
           date: dateTime.toLocaleDateString(),
-          organizers: data.sponsors?.[0] || "Unknown",
+          organizers: data.sponsors?.[0],
           duration: data.duration,
           location: `${data.address}, ${data.city}, ${data.state}`,
         });
         setReviews(
           (data.reviews || []).map((review: any) => ({
             ...review,
-            user: review.user || { _id: "unknown", firstName: "Unknown", lastName: "" },
+            comment: review.comment,
+            user: review.user || { _id: "", firstName: "", lastName: "" },
           }))
         );
       })
       .catch((error) => console.error("Error fetching event details:", error));
   }, [eventId]);
 
-  // Handle registration
-  const handleVolunteerRegister = () => {
-    setIsRegistered(true); // Set the state to true when the user registers
-    alert("Successfully registered to volunteer!"); // Show the success alert
-  };
+  // If eventId is missing, clear all content
+  if (!eventId) {
+    return <></>;
+  }
 
-  const handleReviewSubmit = () => {
-    if (newReview.trim()) {
-      const review: Review = {
-        user: { _id: "anonymous", firstName: "Anonymous", lastName: "" },
-        comment: newReview.trim(),
-        rating: 5,
-      };
-
-      fetch(`http://localhost:3000/api/events/${eventId}/reviews`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(review),
-      })
-        .then((response) => response.json())
-        .then((savedReview) => {
-          setReviews((prev) => [...prev, savedReview]);
-          setNewReview("");
-        })
-        .catch((error) => console.error("Error submitting review:", error));
-    }
-  };
-
+  // While event details are loading
   if (!eventDetails) {
     return (
       <ScreenContainer>
@@ -153,12 +120,14 @@ export function EventDetails() {
           <strong>Location:</strong> {eventDetails.location}
         </Typography>
 
-        {/* Register button with dynamic text */}
         <Button
           variant="contained"
           color="primary"
-          onClick={handleVolunteerRegister}
-          disabled={isRegistered} // Disable if already registered
+          onClick={() => {
+            setIsRegistered(true);
+            alert("Successfully registered to volunteer!");
+          }}
+          disabled={isRegistered}
         >
           {isRegistered ? "Registered to Volunteer" : "Register to Volunteer"}
         </Button>
@@ -176,7 +145,7 @@ export function EventDetails() {
                 {review.user.firstName} {review.user.lastName}
               </Typography>
               <Typography variant="body2">{review.comment}</Typography>
-              <Typography variant="body2">Rating: {review.rating}/5</Typography>
+              <Typography variant="body2">{review.rating}</Typography>
             </Card>
           ))}
         </Stack>
@@ -192,8 +161,28 @@ export function EventDetails() {
         />
         <Button
           variant="contained"
-          onClick={handleReviewSubmit}
-          disabled={!newReview.trim()} // Disable submit if no review text
+          onClick={() => {
+            if (newReview.trim()) {
+              const review: Review = {
+                user: { _id: "anonymous", firstName: "Anonymous", lastName: "" },
+                comment: newReview.trim(),
+                rating: 5,
+              };
+
+              fetch(`http://localhost:3000/api/events/${eventId}/reviews`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(review),
+              })
+                .then((response) => response.json())
+                .then((savedReview) => {
+                  setReviews((prev) => [...prev, savedReview]);
+                  setNewReview("");
+                })
+                .catch((error) => console.error("Error submitting review:", error));
+            }
+          }}
+          disabled={!newReview.trim()}
         >
           Submit Review
         </Button>

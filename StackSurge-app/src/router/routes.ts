@@ -12,7 +12,7 @@ export enum AppPath {
   SignUp = "/sign-up",
   Login = "/login",
   Events = "/events",
-  EventDetails = "/events/:id",
+  EventDetails = "/events/:eventId",
   Profile = "/profile",
 }
 

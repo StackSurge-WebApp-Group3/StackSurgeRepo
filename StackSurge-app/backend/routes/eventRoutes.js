@@ -19,18 +19,18 @@ router.get("/", getEvents);
 
 router
   .route("/:id")
-  .get(authCtrl.requireSignin, getEventById)
-  .put(authCtrl.requireSignin, updateEvent)
-  .delete(authCtrl.requireSignin, removeEvent);
+  .get(getEventById)
+  .put( updateEvent)
+  .delete(removeEvent);
 
-router.post("/:id/register", authCtrl.requireSignin, registerForEvent);
+router.post("/:id/register", registerForEvent);
 router.post(
   "/:id/cancel-registration",
   authCtrl.requireSignin,
   cancelRegistration
 );
 
-router.get("/:id/reviews", authCtrl.requireSignin, getEventReviews);
-router.post("/:id/reviews", authCtrl.requireSignin, addReview);
+router.get("/:id/reviews", getEventReviews);
+router.post("/:id/reviews", addReview);
 
 export default router;
