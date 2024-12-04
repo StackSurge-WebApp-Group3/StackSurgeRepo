@@ -23,8 +23,8 @@ router
   .put( updateEvent)
   .delete(removeEvent);
 
-router.post("/:id/register", registerForEvent);
-router.post(
+router.post("/:id/register", authCtrl.requireSignin, registerForEvent);
+router.delete(
   "/:id/cancel-registration",
   authCtrl.requireSignin,
   cancelRegistration

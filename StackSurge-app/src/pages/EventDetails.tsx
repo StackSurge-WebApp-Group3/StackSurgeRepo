@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
@@ -32,16 +32,18 @@ interface Review {
 
 export function EventDetails() {
   const { eventId } = useParams<{ eventId: string }>();
-  const navigate = useNavigate();
   const [eventDetails, setEventDetails] = useState<EventDetailsProps | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [newReview, setNewReview] = useState("");
   const [isRegistered, setIsRegistered] = useState(false);
 
   useEffect(() => {
-    // If eventId is missing, stop execution
     if (!eventId) {
       return;
+    }
+    const registrationStatus = localStorage.getItem(`isRegistered_${eventId}`);
+    if (registrationStatus === "true") {
+      setIsRegistered(true);
     }
 
     fetch(`http://localhost:3000/api/events/${eventId}`)
@@ -69,7 +71,6 @@ export function EventDetails() {
       .catch((error) => console.error("Error fetching event details:", error));
   }, [eventId]);
 
-  // If eventId is missing, clear all content
   if (!eventId) {
     return <></>;
   }
@@ -119,18 +120,70 @@ export function EventDetails() {
         <Typography variant="body1">
           <strong>Location:</strong> {eventDetails.location}
         </Typography>
-
         <Button
           variant="contained"
           color="primary"
           onClick={() => {
-            setIsRegistered(true);
-            alert("Successfully registered to volunteer!");
+            if (isRegistered) {
+              // Unregister logic
+              setIsRegistered(false);
+              localStorage.removeItem(`isRegistered_${eventId}`);
+
+              fetch(`http://localhost:3000/api/events/${eventId}/cancel-registration`, {
+                method: "DELETE",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              })
+                .then((response) => {
+                  if (!response.ok) {
+                    return response.json().then((data) => {
+                      throw new Error(data.message || "Failed to unregister");
+                    });
+                  }
+                  return response.json();
+                })
+                .then(() => {
+                  alert("Successfully unregistered from the event.");
+                })
+                .catch((error) => {
+                  alert(`Error: ${error.message}`);
+                  setIsRegistered(true);
+                });
+            } else {
+              setIsRegistered(true);
+              localStorage.setItem(`isRegistered_${eventId}`, "true");
+
+              fetch(`http://localhost:3000/api/events/${eventId}/register`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              })
+                .then((response) => {
+                  if (!response.ok) {
+                    return response.json().then((data) => {
+                      throw new Error(data.message || "Failed to register");
+                    });
+                  }
+                  return response.json();
+                })
+                .then(() => {
+                  alert("Successfully registered to volunteer!");
+                })
+                .catch((error) => {
+                  alert(`Error: ${error.message}`);
+                  setIsRegistered(false);
+                });
+            }
           }}
-          disabled={isRegistered}
         >
-          {isRegistered ? "Registered to Volunteer" : "Register to Volunteer"}
+          {isRegistered ? "Cancel Registration" : "Register to Volunteer"}
         </Button>
+
+
 
         <Divider sx={{ width: "100%" }} />
 

@@ -101,7 +101,6 @@ export async function removeEvent(req, res) {
   }
 }
 
-// Add the logged-in user to the list of volunteers for an event if available
 export async function registerForEvent(req, res) {
   try {
     const event = await Event.findById(req.params.id)
@@ -123,22 +122,18 @@ export async function registerForEvent(req, res) {
     if (event.totalAvailableSlots <= event.volunteers.length) {
       return res.status(400).json({ message: "No slots available" });
     }
-    if (event.volunteers.includes(req.auth._id)) {
+    if (event.volunteers.some((volunteer) => volunteer._id.equals(req.auth._id))) {
       return res.status(400).json({ message: "User is already registered" });
     }
 
-    // Assuming the user is authenticated
+    // Add user to event's volunteers and event to user's enrolledEvents
     event.volunteers.push(req.auth._id);
-
-    // Update event and add it to the user’s enrolledEvents
     await Promise.all([
       event.save(),
-      User.findByIdAndUpdate(req.auth._id, {
-        $push: { enrolledEvents: event._id },
-      }),
+      User.findByIdAndUpdate(req.auth._id, { $push: { enrolledEvents: event._id } }),
     ]);
 
-    res.json(event);
+    res.status(200).json({ message: "Registration successful", event });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -147,6 +142,11 @@ export async function registerForEvent(req, res) {
 // Removes the logged-in user from the list of volunteers
 export async function cancelRegistration(req, res) {
   try {
+    // Ensure the user is authenticated
+    if (!req.auth || !req.auth._id) {
+      return res.status(401).json({ message: "Unauthorized: User ID not found" });
+    }
+
     const event = await Event.findById(req.params.id)
       .populate({
         path: "reviews",
@@ -161,24 +161,31 @@ export async function cancelRegistration(req, res) {
       return res.status(404).json({ message: "Event not found" });
     }
 
-    // Assuming the user is authenticated
+    const userId = req.auth._id;
+    const initialVolunteerCount = event.volunteers.length;
+
     event.volunteers = event.volunteers.filter(
-      (volunteerId) => volunteerId.toString() !== req.auth._id
+      (volunteer) => volunteer._id.toString() !== userId
     );
 
-    // Save event and remove event reference from user’s enrolledEvents
     await Promise.all([
       event.save(),
-      User.findByIdAndUpdate(req.auth._id, {
+      User.findByIdAndUpdate(userId, {
         $pull: { enrolledEvents: event._id },
       }),
     ]);
 
-    res.json(event);
+    res.json({
+      message: "Registration cancelled successfully",
+      eventId: event._id,
+      removedUser: userId,
+      remainingVolunteers: initialVolunteerCount - 1,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 }
+
 
 // Create a review for an event
 export async function addReview(req, res) {
