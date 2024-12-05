@@ -9,7 +9,7 @@ import { Container, Box, Card, CardContent } from '@mui/material'
 
 import { AppPath } from '../router/routes'
 
-import Logo from '../assets/CircleLogo.png'
+import Logo from '../assets/CircleLogo.webp'
 import { getEvents } from '../services/events'
 
 export function Home() {
