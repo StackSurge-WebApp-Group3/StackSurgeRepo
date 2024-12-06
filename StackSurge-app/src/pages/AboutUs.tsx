@@ -12,32 +12,32 @@ const teamMembers = [
   {
     name: "Ameekha",
     role: "Project Management & Tracking",
-    image: "../src/assets/ameekha.png",
+    image: "../src/assets/ameekha.webp",
   },
   {
     name: "Aisha",
     role: "Backend Developer",
-    image: "../src/assets/aisha.png",
+    image: "../src/assets/aisha.webp",
   },
   {
     name: "Estefany",
     role: "Backend Developer",
-    image: "../src/assets/estefany.png",
+    image: "../src/assets/estefany.webp",
   },
   {
     name: "Ido Isaac",
     role: "UI Designer",
-    image: "../src/assets/ido.png",
+    image: "../src/assets/ido.webp",
   },
   {
     name: "Patrick",
     role: "Backend Developer",
-    image: "../src/assets/patrick.png",
+    image: "../src/assets/patrick.webp",
   },
   {
     name: "Zachary Lyons",
     role: "Frontend Developer",
-    image: "../src/assets/zach.png",
+    image: "../src/assets/zach.webp",
   },
 ];
 
