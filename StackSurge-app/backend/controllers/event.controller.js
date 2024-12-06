@@ -16,7 +16,7 @@ export async function getEvents(req, res) {
     const events = await Event.find(query)
       .populate({
         path: "reviews",
-        select: "comment rating",
+        select: "comment rating user",
       })
       .populate({
         path: "volunteers",
@@ -35,7 +35,10 @@ export async function getEventById(req, res) {
     const event = await Event.findById(req.params.id)
       .populate({
         path: "reviews",
-        select: "comment rating",
+        populate: {
+          path: 'user',
+          select: 'firstName lastName'
+        } 
       })
       .populate({
         path: "volunteers",
@@ -206,18 +209,6 @@ export async function addReview(req, res) {
       return res.status(404).json({ message: "Event not found" });
     }
 
-    // Check if the user has already reviewed this event
-    const existingReview = await Review.findOne({
-      event: event._id,
-      user: req.auth._id,
-    });
-
-    if (existingReview) {
-      return res.status(400).json({
-        message: "You have already reviewed this event.",
-      });
-    }
-
     // Create the review
     const review = new Review({
       comment,
@@ -228,7 +219,7 @@ export async function addReview(req, res) {
 
     // Add review reference to Event and update the average rating
     const newAvgRating =
-      (event.avg_rating * event.reviews.length + rating) /
+      (event.avg_rating * event.reviews.length + rating) / 
       (event.reviews.length + 1);
     event.reviews.push(review._id);
     event.avg_rating = newAvgRating;
@@ -242,21 +233,48 @@ export async function addReview(req, res) {
       }),
     ]);
 
-    res.status(201).json(event);
+    // Return the review object instead of the entire event object
+    res.status(201).json(review); // Sending only the created review back
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 }
 
+
 // Get reviews for an event
 export async function getEventReviews(req, res) {
   try {
     const reviews = await Review.find({ event: req.params.id })
-      .populate("user", "firstName lastName")
-      .select("comment rating user");
+      .populate("user", "firstName lastName") // Populate user details
+      .select("comment rating user"); // Select the necessary fields
 
     res.json(reviews);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 }
+
+
+export async function handleDeleteReview(req, res) {
+  try {
+    console.log('Deleting review for reviewId:', req.body.reviewId);
+    const { reviewId } = req.body; 
+    const review = await Review.findById(reviewId);
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    await Promise.all([
+      Event.findByIdAndUpdate(review.event, { $pull: { reviews: review._id } }),
+      User.findByIdAndUpdate(review.user, { $pull: { givenReviews: review._id } }),
+      Review.findByIdAndDelete(reviewId),
+    ]);
+
+    res.json({ message: "Review deleted successfully" });
+  } catch (error) {
+    console.error('Error during review deletion:', error);
+    res.status(500).json({ message: error.message });
+  }
+}
+

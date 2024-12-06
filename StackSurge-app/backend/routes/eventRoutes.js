@@ -10,6 +10,7 @@ import {
   cancelRegistration,
   addReview,
   getEventReviews,
+  handleDeleteReview,
 } from "../controllers/event.controller.js";
 
 const router = express.Router();
@@ -30,7 +31,8 @@ router.delete(
   cancelRegistration
 );
 
-router.get("/:id/reviews", getEventReviews);
-router.post("/:id/reviews", addReview);
+router.get("/:id/reviews", authCtrl.requireSignin, getEventReviews);
+router.post("/:id/reviews", authCtrl.requireSignin, addReview);
+router.delete("/:id/review-delete", authCtrl.requireSignin, handleDeleteReview);
 
 export default router;
