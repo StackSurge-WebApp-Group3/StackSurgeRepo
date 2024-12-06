@@ -9,6 +9,8 @@ import Divider from "@mui/material/Divider";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { useAuth } from "../context/AuthContext";
+import Rating from "@mui/material/Rating";
 
 interface EventDetailsProps {
   title: string;
@@ -21,6 +23,7 @@ interface EventDetailsProps {
 }
 
 interface Review {
+  _id: string;
   user: {
     _id: string;
     firstName: string;
@@ -31,16 +34,17 @@ interface Review {
 }
 
 export function EventDetails() {
+  const { user } = useAuth();
   const { eventId } = useParams<{ eventId: string }>();
   const [eventDetails, setEventDetails] = useState<EventDetailsProps | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [newReview, setNewReview] = useState("");
   const [isRegistered, setIsRegistered] = useState(false);
+  const [rating, setRating] = useState<number>(5);
 
   useEffect(() => {
-    if (!eventId) {
-      return;
-    }
+    if (!eventId) return;
+
     const registrationStatus = localStorage.getItem(`isRegistered_${eventId}`);
     if (registrationStatus === "true") {
       setIsRegistered(true);
@@ -49,8 +53,9 @@ export function EventDetails() {
     fetch(`http://localhost:3000/api/events/${eventId}`)
       .then((response) => response.json())
       .then((data) => {
-        console.log("API Response:", data);
         const dateTime = new Date(data.datetime);
+
+        // Set event details
         setEventDetails({
           title: data.title,
           images: [data.coverImage],
@@ -60,13 +65,15 @@ export function EventDetails() {
           duration: data.duration,
           location: `${data.address}, ${data.city}, ${data.state}`,
         });
-        setReviews(
-          (data.reviews || []).map((review: any) => ({
-            ...review,
-            comment: review.comment,
-            user: review.user || { _id: "", firstName: "", lastName: "" },
-          }))
-        );
+
+        // Set reviews
+        const fetchedReviews = (data.reviews || []).map((review: any) => ({
+          _id: review._id,
+          user: review.user || { _id: "", firstName: "", lastName: "" },
+          comment: review.comment,
+          rating: review.rating,
+        }));
+        setReviews(fetchedReviews);
       })
       .catch((error) => console.error("Error fetching event details:", error));
   }, [eventId]);
@@ -75,7 +82,6 @@ export function EventDetails() {
     return <></>;
   }
 
-  // While event details are loading
   if (!eventDetails) {
     return (
       <ScreenContainer>
@@ -85,6 +91,41 @@ export function EventDetails() {
       </ScreenContainer>
     );
   }
+
+  // Function to delete a review
+  const handleDeleteReview = (reviewId: string) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("You need to be logged in to delete a review.");
+      return;
+    }
+
+    fetch(`http://localhost:3000/api/events/${eventId}/review-delete`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ reviewId }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((data) => {
+            console.error("Backend error response:", data);
+            throw new Error(data.message || "Failed to delete review");
+          });
+        }
+        return response.json();
+      })
+      .then(() => {
+        setReviews((prevReviews) => prevReviews.filter((review) => review._id !== reviewId));
+        alert("Review deleted successfully.");
+      })
+      .catch((error) => {
+        console.error("Error deleting review:", error);
+        alert(`Error deleting review: ${error.message}`);
+      });
+  };
 
   return (
     <ScreenContainer>
@@ -104,7 +145,6 @@ export function EventDetails() {
         </Grid>
 
         <Divider sx={{ width: "100%" }} />
-
         <Typography variant="body1">
           <strong>Time:</strong> {eventDetails.time}
         </Typography>
@@ -120,12 +160,12 @@ export function EventDetails() {
         <Typography variant="body1">
           <strong>Location:</strong> {eventDetails.location}
         </Typography>
+
         <Button
           variant="contained"
           color="primary"
           onClick={() => {
             if (isRegistered) {
-              // Unregister logic
               setIsRegistered(false);
               localStorage.removeItem(`isRegistered_${eventId}`);
 
@@ -136,17 +176,8 @@ export function EventDetails() {
                   Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
               })
-                .then((response) => {
-                  if (!response.ok) {
-                    return response.json().then((data) => {
-                      throw new Error(data.message || "Failed to unregister");
-                    });
-                  }
-                  return response.json();
-                })
-                .then(() => {
-                  alert("Successfully unregistered from the event.");
-                })
+                .then((response) => response.json())
+                .then(() => alert("Successfully unregistered from the event."))
                 .catch((error) => {
                   alert(`Error: ${error.message}`);
                   setIsRegistered(true);
@@ -162,17 +193,8 @@ export function EventDetails() {
                   Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
               })
-                .then((response) => {
-                  if (!response.ok) {
-                    return response.json().then((data) => {
-                      throw new Error(data.message || "Failed to register");
-                    });
-                  }
-                  return response.json();
-                })
-                .then(() => {
-                  alert("Successfully registered to volunteer!");
-                })
+                .then((response) => response.json())
+                .then(() => alert("Successfully registered to volunteer!"))
                 .catch((error) => {
                   alert(`Error: ${error.message}`);
                   setIsRegistered(false);
@@ -183,8 +205,6 @@ export function EventDetails() {
           {isRegistered ? "Cancel Registration" : "Register to Volunteer"}
         </Button>
 
-
-
         <Divider sx={{ width: "100%" }} />
 
         <Typography variant="h5" sx={{ textAlign: "center", marginTop: 3 }}>
@@ -192,13 +212,25 @@ export function EventDetails() {
         </Typography>
 
         <Stack gap={2} sx={{ width: "100%" }}>
-          {reviews.map((review, index) => (
-            <Card key={index} sx={{ padding: 2 }}>
+          {reviews.map((review) => (
+            <Card key={review._id} sx={{ padding: 2 }}>
               <Typography variant="subtitle1">
                 {review.user.firstName} {review.user.lastName}
               </Typography>
               <Typography variant="body2">{review.comment}</Typography>
-              <Typography variant="body2">{review.rating}</Typography>
+              <Typography variant="body2">Rating: {review.rating}</Typography>
+
+              {/* Show Delete Button only if user owns the review */}
+              {user?._id === review.user._id && (
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => handleDeleteReview(review._id)}
+                  sx={{ marginTop: 1 }}
+                >
+                  Delete Review
+                </Button>
+              )}
             </Card>
           ))}
         </Stack>
@@ -212,27 +244,63 @@ export function EventDetails() {
           value={newReview}
           onChange={(e) => setNewReview(e.target.value)}
         />
+
+        <Rating
+          name="rating"
+          value={rating}
+          onChange={(event, newValue) => setRating(newValue || 0)}
+          sx={{ marginTop: 2 }}
+        />
+
         <Button
           variant="contained"
           onClick={() => {
             if (newReview.trim()) {
+              const token = localStorage.getItem("token");
+              if (!token) {
+                alert("You need to be logged in to submit a review.");
+                return;
+              }
+
               const review: Review = {
-                user: { _id: "anonymous", firstName: "Anonymous", lastName: "" },
+                _id: "",
+                user: { 
+                  _id: user?._id || "", 
+                  firstName: user?.firstName || "", 
+                  lastName: user?.lastName || "", 
+                },
                 comment: newReview.trim(),
-                rating: 5,
+                rating,
               };
 
               fetch(`http://localhost:3000/api/events/${eventId}/reviews`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(review),
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ comment: review.comment, rating: review.rating }),
               })
-                .then((response) => response.json())
-                .then((savedReview) => {
-                  setReviews((prev) => [...prev, savedReview]);
-                  setNewReview("");
+                .then((response) => {
+                  if (!response.ok) {
+                    return response.json().then((data) => {
+                      throw new Error(data.message || "Failed to submit review");
+                    });
+                  }
+                  return response.json();
                 })
-                .catch((error) => console.error("Error submitting review:", error));
+                .then((savedReview) => {
+                  setNewReview("");
+                  setRating(5);
+                  setReviews((prevReviews) => [
+                    ...prevReviews,
+                    { ...savedReview, user: review.user },
+                  ]);
+                })
+                .catch((error) => {
+                  console.error("Error submitting review:", error);
+                  alert("Failed to submit review.");
+                });
             }
           }}
           disabled={!newReview.trim()}
