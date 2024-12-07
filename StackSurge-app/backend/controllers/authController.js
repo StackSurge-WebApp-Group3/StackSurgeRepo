@@ -1,11 +1,7 @@
-import config from "../config/config.js";
-import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import { expressjwt } from "express-jwt";
 
-console.log("Environment in serverless function:", process.env);
-console.log("JWT_SECRET from environment:", process.env.JWT_SECRET);
-console.log("Final jwtSecret value in config:", config.jwtSecret);
+import User from "../models/user.js";
 
 const signin = async (req, res) => {
   try {
@@ -17,7 +13,7 @@ const signin = async (req, res) => {
         .send({ error: "Email and password don't match." });
     }
     // Generate a JWT token
-    const token = jwt.sign({ _id: user._id }, config.jwtSecret, {
+    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
 
@@ -49,7 +45,7 @@ const signout = (req, res) => {
   });
 };
 const requireSignin = expressjwt({
-  secret: config.jwtSecret,
+  secret: process.env.JWT_SECRET,
   algorithms: ["HS256"],
   userProperty: "auth",
 });
