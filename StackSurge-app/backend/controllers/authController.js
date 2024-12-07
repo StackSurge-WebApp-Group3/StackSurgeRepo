@@ -3,6 +3,7 @@ import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import { expressjwt } from "express-jwt";
 
+console.log("Environment in serverless function:", process.env);
 console.log("JWT_SECRET from environment:", process.env.JWT_SECRET);
 console.log("Final jwtSecret value in config:", config.jwtSecret);
 
