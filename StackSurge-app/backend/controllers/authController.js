@@ -3,6 +3,9 @@ import User from "../models/user.js";
 import jwt from "jsonwebtoken";
 import { expressjwt } from "express-jwt";
 
+console.log("JWT_SECRET from environment:", process.env.JWT_SECRET);
+console.log("Final jwtSecret value in config:", config.jwtSecret);
+
 const signin = async (req, res) => {
   try {
     let user = await User.findOne({ email: req.body.email });
@@ -12,30 +15,31 @@ const signin = async (req, res) => {
         .status("401")
         .send({ error: "Email and password don't match." });
     }
-     // Generate a JWT token
-     const token = jwt.sign({ _id: user._id }, config.jwtSecret, { expiresIn: '1d' });
-    
-     // Optionally, set the token in a cookie
-     res.cookie("t", token, { expire: new Date() + 9999 });
- 
-     // Send the response with the token and user data
-     return res.json({
-       token,
-       user: {
-         _id: user._id,
-         firstName: user.firstName,
-         lastName: user.lastName,
-         email: user.email,
-         interests: user.interests,
-         volunteerTime: user.volunteerTime,
-       },
-     });
- 
-   } catch (err) {
-     console.error('Error during sign-in:', err);
-     return res.status(500).json({ error: "Could not sign in" });
-   }
- };
+    // Generate a JWT token
+    const token = jwt.sign({ _id: user._id }, config.jwtSecret, {
+      expiresIn: "1d",
+    });
+
+    // Optionally, set the token in a cookie
+    res.cookie("t", token, { expire: new Date() + 9999 });
+
+    // Send the response with the token and user data
+    return res.json({
+      token,
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        interests: user.interests,
+        volunteerTime: user.volunteerTime,
+      },
+    });
+  } catch (err) {
+    console.error("Error during sign-in:", err);
+    return res.status(500).json({ error: "Could not sign in" });
+  }
+};
 
 const signout = (req, res) => {
   res.clearCookie("t");
