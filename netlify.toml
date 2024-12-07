@@ -3,6 +3,9 @@
   publish = "dist" # Frontend output directory
   functions = "backend" # Backend serverless functions directory
 
+[build.environment]
+  NODE_VERSION = "20"
+
 [dev]
   framework = "vite" # Specify Vite as the framework for local dev
   command = "npm run dev" # Vite dev command for frontend
