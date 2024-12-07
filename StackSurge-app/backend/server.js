@@ -5,9 +5,9 @@ import cors from "cors";
 import serverless from "serverless-http";
 import dotenv from "dotenv";
 
-import authRoutes from "./routes/authRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
-import eventRoutes from "./routes/eventRoutes.js";
+import { authRoutes } from "./routes/authRoutes.js";
+import { userRoutes } from "./routes/userRoutes.js";
+import { eventRoutes } from "./routes/eventRoutes.js";
 
 dotenv.config();
 
@@ -43,7 +43,14 @@ mongoose
 // Define routes
 app.use("/api/events", eventRoutes);
 app.use("/api/users", userRoutes);
-app.use("/", authRoutes);
+app.use(
+  "/",
+  (req, res, next) => {
+    console.log("Auth route middleware hit");
+    next();
+  },
+  authRoutes
+);
 
 // Adjust the base path for Netlify Functions
 const router = express.Router();

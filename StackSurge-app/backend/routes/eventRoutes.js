@@ -30,4 +30,4 @@ router.get("/:id/reviews", requireSignin, getEventReviews);
 router.post("/:id/reviews", requireSignin, addReview);
 router.delete("/:id/review-delete", requireSignin, handleDeleteReview);
 
-export default router;
+export const eventRoutes = router;

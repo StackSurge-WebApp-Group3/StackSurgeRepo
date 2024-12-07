@@ -29,4 +29,4 @@ router
   .put(requireSignin, hasAuthorization, updateUser)
   .delete(requireSignin, hasAuthorization, removeUser);
 
-export default router;
+export const userRoutes = router;

@@ -3,6 +3,8 @@ import { expressjwt } from "express-jwt";
 
 import User from "../models/user.js";
 
+console.log("JWT_SECRET in signin:", process.env.JWT_SECRET);
+
 export const signin = async (req, res) => {
   try {
     let user = await User.findOne({ email: req.body.email });
