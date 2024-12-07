@@ -43,14 +43,7 @@ mongoose
 // Define routes
 app.use("/api/events", eventRoutes);
 app.use("/api/users", userRoutes);
-app.use(
-  "/",
-  (req, res, next) => {
-    console.log("Auth route middleware hit");
-    next();
-  },
-  authRoutes
-);
+app.use("/", authRoutes);
 
 // Adjust the base path for Netlify Functions
 const router = express.Router();

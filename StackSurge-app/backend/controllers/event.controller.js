@@ -1,6 +1,6 @@
-import Event from "../models/event.model.js";
-import Review from "../models/review.model.js";
-import User from "../models/user.js";
+import { Event } from "../models/event.model.js";
+import { Review } from "../models/review.model.js";
+import { User } from "../models/user.js";
 
 // Get events: Allows filtering by title (search query), category, and status through query parameters
 export async function getEvents(req, res) {
@@ -36,9 +36,9 @@ export async function getEventById(req, res) {
       .populate({
         path: "reviews",
         populate: {
-          path: 'user',
-          select: 'firstName lastName'
-        } 
+          path: "user",
+          select: "firstName lastName",
+        },
       })
       .populate({
         path: "volunteers",
@@ -125,7 +125,9 @@ export async function registerForEvent(req, res) {
     if (event.totalAvailableSlots <= event.volunteers.length) {
       return res.status(400).json({ message: "No slots available" });
     }
-    if (event.volunteers.some((volunteer) => volunteer._id.equals(req.auth._id))) {
+    if (
+      event.volunteers.some((volunteer) => volunteer._id.equals(req.auth._id))
+    ) {
       return res.status(400).json({ message: "User is already registered" });
     }
 
@@ -133,7 +135,9 @@ export async function registerForEvent(req, res) {
     event.volunteers.push(req.auth._id);
     await Promise.all([
       event.save(),
-      User.findByIdAndUpdate(req.auth._id, { $push: { enrolledEvents: event._id } }),
+      User.findByIdAndUpdate(req.auth._id, {
+        $push: { enrolledEvents: event._id },
+      }),
     ]);
 
     res.status(200).json({ message: "Registration successful", event });
@@ -147,7 +151,9 @@ export async function cancelRegistration(req, res) {
   try {
     // Ensure the user is authenticated
     if (!req.auth || !req.auth._id) {
-      return res.status(401).json({ message: "Unauthorized: User ID not found" });
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: User ID not found" });
     }
 
     const event = await Event.findById(req.params.id)
@@ -189,7 +195,6 @@ export async function cancelRegistration(req, res) {
   }
 }
 
-
 // Create a review for an event
 export async function addReview(req, res) {
   const { rating, comment } = req.body;
@@ -219,7 +224,7 @@ export async function addReview(req, res) {
 
     // Add review reference to Event and update the average rating
     const newAvgRating =
-      (event.avg_rating * event.reviews.length + rating) / 
+      (event.avg_rating * event.reviews.length + rating) /
       (event.reviews.length + 1);
     event.reviews.push(review._id);
     event.avg_rating = newAvgRating;
@@ -240,7 +245,6 @@ export async function addReview(req, res) {
   }
 }
 
-
 // Get reviews for an event
 export async function getEventReviews(req, res) {
   try {
@@ -254,11 +258,10 @@ export async function getEventReviews(req, res) {
   }
 }
 
-
 export async function handleDeleteReview(req, res) {
   try {
-    console.log('Deleting review for reviewId:', req.body.reviewId);
-    const { reviewId } = req.body; 
+    console.log("Deleting review for reviewId:", req.body.reviewId);
+    const { reviewId } = req.body;
     const review = await Review.findById(reviewId);
 
     if (!review) {
@@ -267,14 +270,15 @@ export async function handleDeleteReview(req, res) {
 
     await Promise.all([
       Event.findByIdAndUpdate(review.event, { $pull: { reviews: review._id } }),
-      User.findByIdAndUpdate(review.user, { $pull: { givenReviews: review._id } }),
+      User.findByIdAndUpdate(review.user, {
+        $pull: { givenReviews: review._id },
+      }),
       Review.findByIdAndDelete(reviewId),
     ]);
 
     res.json({ message: "Review deleted successfully" });
   } catch (error) {
-    console.error('Error during review deletion:', error);
+    console.error("Error during review deletion:", error);
     res.status(500).json({ message: error.message });
   }
 }
-

@@ -1,9 +1,7 @@
 import jwt from "jsonwebtoken";
 import { expressjwt } from "express-jwt";
 
-import User from "../models/user.js";
-
-console.log("JWT_SECRET in signin:", process.env.JWT_SECRET);
+import { User } from "../models/user.js";
 
 export const signin = async (req, res) => {
   try {

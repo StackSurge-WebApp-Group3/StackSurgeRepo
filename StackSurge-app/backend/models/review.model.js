@@ -7,4 +7,4 @@ const reviewSchema = new mongoose.Schema({
   event: { type: mongoose.Schema.Types.ObjectId, ref: "Event" },
 });
 
-export default mongoose.model("Review", reviewSchema);
+export const Review = mongoose.model("Review", reviewSchema);

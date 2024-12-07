@@ -32,4 +32,4 @@ const eventSchema = new mongoose.Schema({
   avg_rating: { type: Number, default: 5 },
 });
 
-export default mongoose.model("Event", eventSchema);
+export const Event = mongoose.model("Event", eventSchema);
