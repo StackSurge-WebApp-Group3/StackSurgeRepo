@@ -11,6 +11,7 @@ import CardMedia from "@mui/material/CardMedia";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { useAuth } from "../context/AuthContext";
 import Rating from "@mui/material/Rating";
+import { API_BASE_URL } from "../services/axiosClient";
 
 interface EventDetailsProps {
   title: string;
@@ -50,7 +51,7 @@ export function EventDetails() {
       setIsRegistered(true);
     }
 
-    fetch(`http://localhost:3000/api/events/${eventId}`)
+    fetch(`${API_BASE_URL}/api/events/${eventId}`)
       .then((response) => response.json())
       .then((data) => {
         const dateTime = new Date(data.datetime);
@@ -100,7 +101,7 @@ export function EventDetails() {
       return;
     }
 
-    fetch(`http://localhost:3000/api/events/${eventId}/review-delete`, {
+    fetch(`${API_BASE_URL}/api/events/${eventId}/review-delete`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -169,7 +170,7 @@ export function EventDetails() {
               setIsRegistered(false);
               localStorage.removeItem(`isRegistered_${eventId}`);
 
-              fetch(`http://localhost:3000/api/events/${eventId}/cancel-registration`, {
+              fetch(`${API_BASE_URL}/api/events/${eventId}/cancel-registration`, {
                 method: "DELETE",
                 headers: {
                   "Content-Type": "application/json",
@@ -186,7 +187,7 @@ export function EventDetails() {
               setIsRegistered(true);
               localStorage.setItem(`isRegistered_${eventId}`, "true");
 
-              fetch(`http://localhost:3000/api/events/${eventId}/register`, {
+              fetch(`${API_BASE_URL}/api/events/${eventId}/register`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
@@ -248,7 +249,7 @@ export function EventDetails() {
         <Rating
           name="rating"
           value={rating}
-          onChange={(event, newValue) => setRating(newValue || 0)}
+          onChange={(_, newValue) => setRating(newValue || 0)}
           sx={{ marginTop: 2 }}
         />
 
@@ -273,7 +274,7 @@ export function EventDetails() {
                 rating,
               };
 
-              fetch(`http://localhost:3000/api/events/${eventId}/reviews`, {
+              fetch(`${API_BASE_URL}/api/events/${eventId}/reviews`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json",
