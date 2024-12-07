@@ -34,8 +34,6 @@ app.use(
   })
 );
 
-app.use(bodyParser.json());
-
 // Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URL)
@@ -46,6 +44,19 @@ mongoose
 app.use("/", authRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/users", userRoutes);
+
+// Adjust the base path for Netlify Functions
+const router = express.Router();
+
+router.use(bodyParser.json());
+
+// Define routes
+router.use("/", authRoutes);
+router.use("/api/events", eventRoutes);
+router.use("/api/users", userRoutes);
+
+// Use the router with the base path
+app.use("/.netlify/functions/server", router);
 
 // Export the app as a Netlify function
 export const handler = serverless(app);
