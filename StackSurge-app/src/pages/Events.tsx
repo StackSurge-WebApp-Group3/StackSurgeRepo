@@ -9,6 +9,7 @@ import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import { ScreenContainer } from '../components/ScreenContainer';
+import { API_BASE_URL } from '../services/axiosClient';
 
 interface Event {
   _id: string;
@@ -23,7 +24,7 @@ export function Events() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/events')
+    fetch(`${API_BASE_URL}/api/events`)
       .then((response) => response.json())
       .then((data) => setEvents(data))
       .catch((error) => console.error('Error fetching events:', error));

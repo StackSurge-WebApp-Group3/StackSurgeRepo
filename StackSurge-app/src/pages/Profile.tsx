@@ -3,6 +3,7 @@ import Stack from "@mui/material/Stack";
 import { Typography, Avatar, Box } from "@mui/material";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../services/axiosClient";
 
 export function Profile() {
   const { user } = useAuth();
@@ -12,7 +13,7 @@ export function Profile() {
   // Fetch the user's volunteered events
   useEffect(() => {
     if (user?._id) {
-      fetch(`http://localhost:3000/api/users/profile`, {
+      fetch(`${API_BASE_URL}/api/users/profile`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
