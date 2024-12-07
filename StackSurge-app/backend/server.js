@@ -5,9 +5,9 @@ import cors from "cors";
 import serverless from "serverless-http";
 import dotenv from "dotenv";
 
-import authRoutes from "./routes/authRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
-import eventRoutes from "./routes/eventRoutes.js";
+import authRoutes from "./auth.routes.js";
+import userRoutes from "./user.routes.js";
+import eventRoutes from "./event.routes.js";
 
 dotenv.config();
 

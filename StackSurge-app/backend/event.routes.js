@@ -1,5 +1,5 @@
 import express from "express";
-import authCtrl from "../controllers/authController.js";
+import authCtrl from "./auth.controller.js";
 import {
   createEvent,
   getEvents,
@@ -11,18 +11,14 @@ import {
   addReview,
   getEventReviews,
   handleDeleteReview,
-} from "../controllers/event.controller.js";
+} from "./event.controller.js";
 
 const router = express.Router();
 
 router.post("/", createEvent);
 router.get("/", getEvents);
 
-router
-  .route("/:id")
-  .get(getEventById)
-  .put( updateEvent)
-  .delete(removeEvent);
+router.route("/:id").get(getEventById).put(updateEvent).delete(removeEvent);
 
 router.post("/:id/register", authCtrl.requireSignin, registerForEvent);
 router.delete(

@@ -9,8 +9,8 @@ import {
   removeAllUsers,
   userByID,
   getUserProfile,
-} from "../controllers/userController.js";
-import authCtrl from "../controllers/authController.js";
+} from "./user.controller.js";
+import authCtrl from "./auth.controller.js";
 const router = express.Router();
 
 router.get("/", getAllUsers);

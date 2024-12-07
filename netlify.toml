@@ -11,3 +11,9 @@
   command = "npm run dev" # Vite dev command for frontend
   targetPort = 5173 # Port where Vite serves the frontend
   port = 8888 # Proxy port for Netlify Dev
+
+[functions]
+  directory = "backend"
+  included_files = [
+    "backend/**"
+  ]
