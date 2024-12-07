@@ -7,7 +7,7 @@ describe('Navigation Tests', () => {
   const authRoutes = [
     { path: '/profile', name: 'Profile' },
     { path: '/events', name: 'Events' },
-    { path: '/events/123', name: 'Event Details' }, // Example dynamic route
+    { path: '/events/67343a3d6d5b2456846cabbe', name: 'Event Details' }, // Example dynamic route
   ];
 
   const testNavigation = (route) => {
