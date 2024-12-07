@@ -41,9 +41,9 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Define routes
-app.use("/", authRoutes);
 app.use("/api/events", eventRoutes);
 app.use("/api/users", userRoutes);
+app.use("/", authRoutes);
 
 // Adjust the base path for Netlify Functions
 const router = express.Router();
