@@ -3,7 +3,7 @@ import { expressjwt } from "express-jwt";
 
 import User from "../models/user.js";
 
-const signin = async (req, res) => {
+export const signin = async (req, res) => {
   try {
     let user = await User.findOne({ email: req.body.email });
     if (!user) return res.status("401").json({ error: "User not found" });
@@ -38,19 +38,19 @@ const signin = async (req, res) => {
   }
 };
 
-const signout = (req, res) => {
+export const signout = (req, res) => {
   res.clearCookie("t");
   return res.status("200").json({
     message: "signed out",
   });
 };
-const requireSignin = expressjwt({
+export const requireSignin = expressjwt({
   secret: process.env.JWT_SECRET,
   algorithms: ["HS256"],
   userProperty: "auth",
 });
 
-const hasAuthorization = (req, res, next) => {
+export const hasAuthorization = (req, res, next) => {
   const authorized = req.profile && req.auth && req.profile._id == req.auth._id;
   if (!authorized) {
     return res.status("403").json({
@@ -59,5 +59,3 @@ const hasAuthorization = (req, res, next) => {
   }
   next();
 };
-
-export default { signin, signout, requireSignin, hasAuthorization };
