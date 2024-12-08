@@ -6,38 +6,45 @@ import CardMedia from "@mui/material/CardMedia";
 import Grid from "@mui/material/Grid";
 import Divider from "@mui/material/Divider";
 
+import ameekha from "../assets/ameekha.webp";
+import aisha from "../assets/aisha.webp";
+import estefany from "../assets/estefany.webp";
+import ido from "../assets/ido.webp";
+import patrick from "../assets/patrick.webp";
+import zach from "../assets/zach.webp";
+
 import { ScreenContainer } from "../components/ScreenContainer";
 
 const teamMembers = [
   {
     name: "Ameekha",
     role: "Project Management & Tracking",
-    image: "../src/assets/ameekha.webp",
+    image: ameekha,
   },
   {
     name: "Aisha",
     role: "Backend Developer",
-    image: "../src/assets/aisha.webp",
+    image: aisha,
   },
   {
     name: "Estefany",
     role: "Backend Developer",
-    image: "../src/assets/estefany.webp",
+    image: estefany,
   },
   {
     name: "Ido Isaac",
     role: "UI Designer",
-    image: "../src/assets/ido.webp",
+    image: ido,
   },
   {
     name: "Patrick",
     role: "Backend Developer",
-    image: "../src/assets/patrick.webp",
+    image: patrick,
   },
   {
     name: "Zachary Lyons",
     role: "Frontend Developer",
-    image: "../src/assets/zach.webp",
+    image: zach,
   },
 ];
 
