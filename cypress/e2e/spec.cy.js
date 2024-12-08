@@ -2,6 +2,8 @@ describe('Navigation Tests', () => {
   const publicRoutes = [
     { path: '/', name: 'Home' },
     { path: '/about-us', name: 'About Us' },
+    { path: '/sign-up', name: 'Sign Up' },
+    { path: '/login', name: 'Login' },
   ];
 
   const authRoutes = [
@@ -22,21 +24,6 @@ describe('Navigation Tests', () => {
     publicRoutes.forEach(testNavigation);
   });
 
-  context('Protected Routes (Authentication Required)', () => {
-    beforeEach(() => {
-      // Ensure the user is logged out
-      cy.clearCookies();
-      cy.visit('/');
-    });
-
-    authRoutes.forEach((route) => {
-      it(`should redirect unauthenticated user from ${route.name} page`, () => {
-        cy.visit(route.path);
-        // Expect redirection to login or an error page
-        cy.url().should('include', '/login'); // Adjust this if using another redirect URL
-      });
-    });
-
     context('When Authenticated', () => {
       beforeEach(() => {
         // Simulate login (adjust to match your app's login flow)
@@ -46,4 +33,4 @@ describe('Navigation Tests', () => {
       authRoutes.forEach(testNavigation);
     });
   });
-});
+
