@@ -68,7 +68,7 @@ export function EventDetails() {
         });
 
         // Set reviews
-        const fetchedReviews = (data.reviews || []).map((review: any) => ({
+        const fetchedReviews = (data.reviews || []).map((review: Review) => ({
           _id: review._id,
           user: review.user || { _id: "", firstName: "", lastName: "" },
           comment: review.comment,

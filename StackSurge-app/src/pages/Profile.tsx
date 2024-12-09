@@ -1,14 +1,18 @@
 import { useState, useEffect } from "react";
 import Stack from "@mui/material/Stack";
-import { Typography, Avatar, Box } from "@mui/material";
+import { Typography, Avatar, Box, Chip } from "@mui/material";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { useAuth } from "../context/AuthContext";
 import { API_BASE_URL } from "../services/axiosClient";
+import { EventDetails } from "../types/Event";
+import { EventCard } from "../components/EventCard";
 
 export function Profile() {
   const { user } = useAuth();
   const [profilePic, setProfilePic] = useState<string | null>(null);
-  const [volunteeredEvents, setVolunteeredEvents] = useState<string[]>([]);
+  const [volunteeredEvents, setVolunteeredEvents] = useState<EventDetails[]>(
+    []
+  );
 
   // Fetch the user's volunteered events
   useEffect(() => {
@@ -20,52 +24,55 @@ export function Profile() {
       })
         .then((response) => response.json())
         .then((data) => {
-          setVolunteeredEvents(data.enrolledEvents.map((item: any) => (item.title)) || []);
+          setVolunteeredEvents(data.enrolledEvents || []);
         })
-        .catch((error) => console.error("Error fetching volunteered events:", error));
+        .catch((error) =>
+          console.error("Error fetching volunteered events:", error)
+        );
     }
   }, [user]);
 
   // Fetch the profile picture from localStorage when the component mounts
   useEffect(() => {
-    const storedProfilePic = localStorage.getItem('profilePic');
+    const storedProfilePic = localStorage.getItem("profilePic");
     if (storedProfilePic) {
       setProfilePic(storedProfilePic);
     }
   }, []);
 
   // Handle profile picture upload
-  const handleProfilePicChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleProfilePicChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
         const imageUrl = reader.result as string;
         setProfilePic(imageUrl);
-        localStorage.setItem('profilePic', imageUrl);
+        localStorage.setItem("profilePic", imageUrl);
       };
       reader.readAsDataURL(file);
     }
   };
 
-
   return (
     <ScreenContainer>
-      <Stack gap={3} alignItems="center" style={{ width: '100%' }}>
+      <Stack gap={3} alignItems="center" style={{ width: "100%" }}>
         <Box>
           <Box
             sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
               padding: 3,
-              backgroundColor: 'secondary.main',
+              backgroundColor: "secondary.main",
             }}
           >
             <label htmlFor="profile-pic-upload">
               <Avatar
-                sx={{ width: 130, height: 130, cursor: 'pointer' }}
+                sx={{ width: 130, height: 130, cursor: "pointer" }}
                 src={profilePic || undefined} // Use the profile picture stored in state or null if undefined
               >
                 Profile
@@ -73,7 +80,7 @@ export function Profile() {
               <input
                 type="file"
                 id="profile-pic-upload"
-                style={{ display: 'none' }}
+                style={{ display: "none" }}
                 accept="image/*"
                 onChange={handleProfilePicChange}
               />
@@ -83,17 +90,16 @@ export function Profile() {
                 {user?.firstName} {user?.lastName}
               </Typography>
               <Typography variant="body1">
-                ID: {user?._id}
-                <br />
                 Email: {user?.email}
                 <br />
-                Interests List:
+                Interests:
                 <br />
                 {user?.interests?.map((interest, index) => (
-                  <span key={index}>
-                    {'-'} {interest}
-                    {index !== user.interests.length - 1 && <br />}
-                  </span>
+                  <Chip
+                    key={index}
+                    label={interest}
+                    sx={{ marginRight: 1, marginTop: 1 }}
+                  />
                 ))}
               </Typography>
             </Box>
@@ -101,26 +107,26 @@ export function Profile() {
 
           <Box
             sx={{
-              textAlign: 'center',
-              backgroundColor: 'primary.main',
-              color: 'secondary.main',
+              textAlign: "center",
+              backgroundColor: "primary.main",
+              color: "secondary.main",
               padding: 2,
             }}
           >
-            <Typography variant="h6" sx={{ color: 'secondary.main' }}>
+            <Typography variant="h6" sx={{ color: "secondary.main" }}>
               You have volunteered for:
             </Typography>
             <Box sx={{ paddingTop: 1 }}>
               {volunteeredEvents.length > 0 ? (
-                <ul>
-                  {volunteeredEvents.map((event, index) => (
-                    <li key={index}>
-                      <Typography variant="body1">{event}</Typography>
-                    </li>
+                <Stack>
+                  {volunteeredEvents.map((event) => (
+                    <EventCard key={event._id} event={event} />
                   ))}
-                </ul>
+                </Stack>
               ) : (
-                <Typography variant="body2">You have not volunteered for any events yet.</Typography>
+                <Typography variant="body2">
+                  You have not volunteered for any events yet.
+                </Typography>
               )}
             </Box>
           </Box>
@@ -128,4 +134,4 @@ export function Profile() {
       </Stack>
     </ScreenContainer>
   );
-};
+}
