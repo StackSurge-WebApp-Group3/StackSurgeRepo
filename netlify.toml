@@ -19,3 +19,8 @@ included_files = [
   "backend/models/**",
   "backend/routes/**"
 ]
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
